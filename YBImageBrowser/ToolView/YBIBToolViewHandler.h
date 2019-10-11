@@ -62,6 +62,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 顶部显示页码视图
 @property (nonatomic, strong, readonly) YBIBTopView *topView;
 
+/// 底部显示分享和删除 - cpj
+@property (nonatomic, strong, readonly) UIView *bottomView;
+
 @end
 
 NS_ASSUME_NONNULL_END

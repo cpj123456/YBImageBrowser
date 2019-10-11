@@ -14,6 +14,7 @@
 @property (nonatomic, strong) YBIBSheetView *sheetView;
 @property (nonatomic, strong) YBIBSheetAction *saveAction;
 @property (nonatomic, strong) YBIBTopView *topView;
+@property (nonatomic, strong) UIView *bottomView; //cpj
 @end
 
 @implementation YBIBToolViewHandler
@@ -29,6 +30,13 @@
 
 - (void)yb_containerViewIsReadied {
     [self.yb_containerView addSubview:self.topView];
+    
+    // cpj
+    id<YBIBDataProtocol> data = self.yb_currentData();
+    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(cell_shareImage:)] && [[data yb_projectiveView].superview.superview respondsToSelector:@selector(cell_delImage:)]) {
+        [self.yb_containerView addSubview:self.bottomView];
+    }
+    
     [self layoutWithExpectOrientation:self.yb_currentOrientation()];
 }
 
@@ -70,6 +78,14 @@
     UIEdgeInsets padding = YBIBPaddingByBrowserOrientation(orientation);
     
     self.topView.frame = CGRectMake(padding.left, padding.top, containerSize.width - padding.left - padding.right, [YBIBTopView defaultHeight]);
+    
+    // cpj
+    self.bottomView.frame = CGRectMake(padding.left, containerSize.height-padding.top-[YBIBTopView defaultHeight], containerSize.width - padding.left - padding.right, [YBIBTopView defaultHeight]);
+    
+    UIButton *shareBtn = [self.bottomView viewWithTag:1];
+    UIButton *delBtn = [self.bottomView viewWithTag:2];
+    shareBtn.frame = CGRectMake(0, 0, [YBIBTopView defaultHeight]*1.5, [YBIBTopView defaultHeight]);
+    delBtn.frame = CGRectMake(containerSize.width - padding.left - padding.right-[YBIBTopView defaultHeight]*1.5, 0, [YBIBTopView defaultHeight]*1.5, [YBIBTopView defaultHeight]);
 }
 
 - (void)showSheetView {
@@ -139,6 +155,50 @@
         }];
     }
     return _topView;
+}
+
+#pragma mark - cpj
+- (UIView *)bottomView{
+    if (!_bottomView) {
+        _bottomView = [UIView new];
+        UIButton* shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        shareBtn.tag = 1;
+        shareBtn.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+        [shareBtn setTitle:@"分享" forState:UIControlStateNormal];
+        [shareBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [shareBtn addTarget:self action:@selector(clickShareBtn:) forControlEvents:UIControlEventTouchUpInside];
+ 
+        UIButton* delBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        delBtn.tag = 2;
+        delBtn.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+        [delBtn setTitle:@"删除" forState:UIControlStateNormal];
+        [delBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [delBtn addTarget:self action:@selector(clickDelBtn:) forControlEvents:UIControlEventTouchUpInside];
+        
+        [_bottomView addSubview:shareBtn];
+        [_bottomView addSubview:delBtn];
+    }
+    return _bottomView;
+}
+
+- (void)clickShareBtn:(UIButton*)btn {
+    NSLog(@"clickShareBtn:");
+    id<YBIBDataProtocol> data = self.yb_currentData();
+    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(cell_shareImage:)]) {
+        [[data yb_projectiveView].superview.superview performSelector:@selector(cell_shareImage:) withObject:btn];
+    }else {
+        NSLog(@"yb_projectiveView 未添加 yb_shareImage:");
+    }
+}
+
+- (void)clickDelBtn:(UIButton*)btn {
+    NSLog(@"clickDelBtn:");
+    id<YBIBDataProtocol> data = self.yb_currentData();
+    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(cell_delImage:)]) {
+        [[data yb_projectiveView].superview.superview performSelector:@selector(cell_delImage:) withObject:btn];
+    }else {
+        NSLog(@"yb_projectiveView 未添加 yb_delImage:");
+    }
 }
 
 @end
