@@ -30,14 +30,17 @@
 
 - (void)yb_containerViewIsReadied {
     [self.yb_containerView addSubview:self.topView];
+    [self.yb_containerView addSubview:self.bottomView]; // cpj
+    [self layoutWithExpectOrientation:self.yb_currentOrientation()];
     
     // cpj
     id<YBIBDataProtocol> data = self.yb_currentData();
-    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(cell_shareImage:)] && [[data yb_projectiveView].superview.superview respondsToSelector:@selector(cell_delImage:)]) {
-        [self.yb_containerView addSubview:self.bottomView];
+    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowBottomView)]) {
+        BOOL isShowBottomView = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowBottomView)];
+        self.bottomView.hidden = !isShowBottomView;
+    }else {
+        self.bottomView.hidden = YES;
     }
-    
-    [self layoutWithExpectOrientation:self.yb_currentOrientation()];
 }
 
 - (void)yb_pageChanged {
