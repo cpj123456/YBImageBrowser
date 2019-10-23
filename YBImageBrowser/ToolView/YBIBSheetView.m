@@ -29,6 +29,7 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
+        self.backgroundColor = [UIColor whiteColor];
         _titleLabel = [UILabel new];
         _titleLabel.textColor = UIColor.darkTextColor;
         _titleLabel.font = [UIFont fontWithName:@"Avenir-Medium" size:16];
