@@ -34,13 +34,25 @@
     [self layoutWithExpectOrientation:self.yb_currentOrientation()];
     
     // cpj
+    //    id<YBIBDataProtocol> data = self.yb_currentData();
+    //    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowBottomView)]) {
+    //        BOOL isShowBottomView = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowBottomView)];
+    //        self.bottomView.hidden = !isShowBottomView;
+    //    }else {
+    //        self.bottomView.hidden = YES;
+    //    }
+        
+    BOOL isShowDel = NO;
+    BOOL isShowShare = NO;
     id<YBIBDataProtocol> data = self.yb_currentData();
-    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowBottomView)]) {
-        BOOL isShowBottomView = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowBottomView)];
-        self.bottomView.hidden = !isShowBottomView;
-    }else {
-        self.bottomView.hidden = YES;
+    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowDelBtn)]) {
+        isShowDel = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowDelBtn)];
     }
+    
+    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowShareBtn)]) {
+        isShowShare = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowShareBtn)];
+    }
+    self.bottomView.hidden = !(isShowShare || isShowDel);
 }
 
 - (void)yb_pageChanged {
@@ -180,6 +192,21 @@
         
         [_bottomView addSubview:shareBtn];
         [_bottomView addSubview:delBtn];
+        // cpj
+        id<YBIBDataProtocol> data = self.yb_currentData();
+        if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowDelBtn)]) {
+            BOOL isShow = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowDelBtn)];
+            delBtn.hidden = !isShow;
+        } else {
+            delBtn.hidden = YES;
+        }
+        
+        if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowShareBtn)]) {
+            BOOL isShow = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowShareBtn)];
+            shareBtn.hidden = !isShow;
+        } else {
+            shareBtn.hidden = YES;
+        }
     }
     return _bottomView;
 }
