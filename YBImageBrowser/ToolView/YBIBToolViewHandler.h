@@ -13,6 +13,10 @@
 #import "YBIBOperateBrowserProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
+// cpj
+@interface UIView (VC)
+- (UIViewController*)viewController;
+@end
 
 @protocol YBIBToolViewHandler <YBIBGetBaseInfoProtocol, YBIBOperateBrowserProtocol, YBIBOrientationReceiveProtocol>
 

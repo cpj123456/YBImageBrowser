@@ -10,6 +10,26 @@
 #import "YBIBCopywriter.h"
 #import "YBIBUtilities.h"
 
+// cpj
+@implementation UIView (VC)
+- (UIViewController *)viewController
+{
+    if ([[self nextResponder] isKindOfClass:[UIViewController class]]) {
+        return (UIViewController*)[self nextResponder];
+    }
+    
+    for (UIView* next = [self superview]; next; next = next.superview)
+    {
+        UIResponder *nextResponder = [next nextResponder];
+        if ([nextResponder isKindOfClass:[UIViewController class]])
+        {
+            return (UIViewController *)nextResponder;
+        }
+    }
+    return nil;
+}
+@end
+
 @interface YBIBToolViewHandler ()
 @property (nonatomic, strong) YBIBSheetView *sheetView;
 @property (nonatomic, strong) YBIBSheetAction *saveAction;
@@ -41,17 +61,10 @@
     //    }else {
     //        self.bottomView.hidden = YES;
     //    }
-        
-    BOOL isShowDel = NO;
-    BOOL isShowShare = NO;
     id<YBIBDataProtocol> data = self.yb_currentData();
-    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowDelBtn)]) {
-        isShowDel = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowDelBtn)];
-    }
+    BOOL isShowDel = [[data yb_projectiveView].viewController respondsToSelector:@selector(delBtnClick:)];
+    BOOL isShowShare = [[data yb_projectiveView].viewController respondsToSelector:@selector(shareBtnClick:)];
     
-    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowShareBtn)]) {
-        isShowShare = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowShareBtn)];
-    }
     self.bottomView.hidden = !(isShowShare || isShowDel);
 }
 
@@ -192,21 +205,9 @@
         
         [_bottomView addSubview:shareBtn];
         [_bottomView addSubview:delBtn];
-        // cpj
         id<YBIBDataProtocol> data = self.yb_currentData();
-        if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowDelBtn)]) {
-            BOOL isShow = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowDelBtn)];
-            delBtn.hidden = !isShow;
-        } else {
-            delBtn.hidden = YES;
-        }
-        
-        if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(isBrowerShowShareBtn)]) {
-            BOOL isShow = [[data yb_projectiveView].superview.superview performSelector:@selector(isBrowerShowShareBtn)];
-            shareBtn.hidden = !isShow;
-        } else {
-            shareBtn.hidden = YES;
-        }
+        delBtn.hidden = ![[data yb_projectiveView].viewController respondsToSelector:@selector(delBtnClick:)];
+        shareBtn.hidden = ![[data yb_projectiveView].viewController respondsToSelector:@selector(shareBtnClick:)];
     }
     return _bottomView;
 }
@@ -214,8 +215,8 @@
 - (void)clickShareBtn:(UIButton*)btn {
     NSLog(@"clickShareBtn:");
     id<YBIBDataProtocol> data = self.yb_currentData();
-    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(cell_shareImage:)]) {
-        [[data yb_projectiveView].superview.superview performSelector:@selector(cell_shareImage:) withObject:btn];
+    if([[data yb_projectiveView].viewController respondsToSelector:@selector(shareBtnClick:)]) {
+        [[data yb_projectiveView].viewController performSelector:@selector(shareBtnClick:) withObject:@(self.yb_currentPage())];
     }else {
         NSLog(@"yb_projectiveView 未添加 yb_shareImage:");
     }
@@ -224,8 +225,8 @@
 - (void)clickDelBtn:(UIButton*)btn {
     NSLog(@"clickDelBtn:");
     id<YBIBDataProtocol> data = self.yb_currentData();
-    if([[data yb_projectiveView].superview.superview respondsToSelector:@selector(cell_delImage:)]) {
-        [[data yb_projectiveView].superview.superview performSelector:@selector(cell_delImage:) withObject:btn];
+    if([[data yb_projectiveView].viewController respondsToSelector:@selector(delBtnClick:)]) {
+        [[data yb_projectiveView].viewController performSelector:@selector(delBtnClick:) withObject:@(self.yb_currentPage())];
     }else {
         NSLog(@"yb_projectiveView 未添加 yb_delImage:");
     }
